@@ -13,12 +13,14 @@ module Clockwork
 
   handler do |job|
     Dog.batch_metrics do
-      Resque.info.slice(:failed, :pending, :workers, :processed, :working).map do |k, v|
+      Resque.info.slice(:failed, :pending, :workers, :processed, :working).each do |k, v|
         Dog.emit_point("resque.#{k}", v)
       end
-    end
 
-    puts Resque.info.slice(:failed, :pending, :workers, :processed, :working)
+      Resque.queues.each do |queue|
+        Dog.emit_point("resque.queues.#{queue}.size", Resque.size(queue))
+      end
+    end
   end
 
   every(15.seconds, 'resque')
