@@ -46,6 +46,7 @@ PLATFORMS
 DEPENDENCIES
   clockwork
   dogapi
+  redis-namespace
   resque
 
 BUNDLED WITH
