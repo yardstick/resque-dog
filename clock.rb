@@ -9,9 +9,17 @@ redis = Redis.new(
 Resque.redis = Redis::Namespace.new('resque', redis: redis)
 
 module Clockwork
+  Dog = Dogapi::Client.new(ENV.fetch('DD_API_KEY'), nil, ENV.fetch('DD_HOST'))
+
   handler do |job|
+    Dog.batch_metrics do
+      Resque.info.slice(:failed, :pending, :workers, :processed, :working).map do |k, v|
+        Dog.emit_point("resque.#{k}", v)
+      end
+    end
+
     puts Resque.info.slice(:failed, :pending, :workers, :processed, :working)
   end
 
-  every(5.seconds, 'resque')
+  every(15.seconds, 'resque')
 end
