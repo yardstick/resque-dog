@@ -2,8 +2,7 @@ require 'bundler/setup'
 Bundler.require
 
 redis = Redis.new(
-  host: ENV.fetch('REDIS_HOST'),
-  port: ENV.fetch('REDIS_PORT').to_i,
+  url: ENV.fetch('REDIS_URL'),
   tcp_keepalive: 60
 )
 Resque.redis = Redis::Namespace.new(ENV.fetch('REDIS_NAMESPACE'), redis: redis)
