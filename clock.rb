@@ -6,7 +6,7 @@ redis = Redis.new(
   port: ENV.fetch('REDIS_PORT').to_i,
   tcp_keepalive: 60
 )
-Resque.redis = Redis::Namespace.new('resque', redis: redis)
+Resque.redis = Redis::Namespace.new(ENV.fetch('REDIS_NAMESPACE'), redis: redis)
 
 module Clockwork
   Dog = Dogapi::Client.new(ENV.fetch('DD_API_KEY'), nil, ENV.fetch('DD_HOST'))
