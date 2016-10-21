@@ -1,12 +1,16 @@
 require 'bundler/setup'
 Bundler.require
 
-redis = Redis.new(
-  host: ENV.fetch('REDIS_HOST'),
-  port: ENV.fetch('REDIS_PORT').to_i,
+options = {
+  url: ENV.fetch('REDIS_URL'),
   tcp_keepalive: 60
-)
-Resque.redis = Redis::Namespace.new('resque', redis: redis)
+}
+unless ENV.fetch('REDIS_SENTINEL').blank?
+  options[:sentinels] = [{:host => ENV.fetch('REDIS_SENTINEL'), :port => 26379}]
+end
+
+redis = Redis.new(options)
+Resque.redis = Redis::Namespace.new(ENV.fetch('REDIS_NAMESPACE'), redis: redis)
 
 module Clockwork
   Dog = Dogapi::Client.new(ENV.fetch('DD_API_KEY'), nil, ENV.fetch('DD_HOST'))
