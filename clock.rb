@@ -1,10 +1,15 @@
 require 'bundler/setup'
 Bundler.require
 
-redis = Redis.new(
+options = {
   url: ENV.fetch('REDIS_URL'),
   tcp_keepalive: 60
-)
+}
+unless ENV.fetch('REDIS_SENTINEL').blank?
+  options[:sentinels] = [{:host => ENV.fetch('REDIS_SENTINEL'), :port => 26379}]
+end
+
+redis = Redis.new(options)
 Resque.redis = Redis::Namespace.new(ENV.fetch('REDIS_NAMESPACE'), redis: redis)
 
 module Clockwork
